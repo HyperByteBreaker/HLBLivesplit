@@ -36,7 +36,13 @@ update
 	if (current.worldState == 0 && old.worldState == 1)
 	{
 		print("dropped into run");
-		vars.startWatch = 1;
+		
+		// only start on fresh run
+		if (current.bossCount == 0 && current.prismCount == 0)
+		{
+			print("run is fresh");
+			vars.startWatch = 1;
+		}
 	}
 	
 	// trigger start on user input;
