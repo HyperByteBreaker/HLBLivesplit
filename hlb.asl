@@ -8,12 +8,15 @@ state("Breaker-Win64-Shipping")
 	float playerXCoord: "Breaker-Win64-Shipping.exe", 0x6322010, 0x30, 0x120, 0xb0, 0x100;
 	float playerYCoord: "Breaker-Win64-Shipping.exe", 0x6322010, 0x30, 0x120, 0xb0, 0x104;
 	float playerZCoord: "Breaker-Win64-Shipping.exe", 0x6322010, 0x30, 0x120, 0xb0, 0x108;
-	//ushort wButtons: "XINPUT1_3.dll", 0x7651, 0x40;
-	uint inputCount: "gameoverlayrenderer64.dll", 0x17BB60;
 	uint teleportRestartAmount_preReport: "Breaker-Win64-Shipping.exe", 0x6322010, 0x30, 0x2b0, 0x3f0, 0x1e8, 0x3f0, 0x278, 0x594;
 	uint teleportRestartAmount_postReport: "Breaker-Win64-Shipping.exe", 0x5F48B80, 0x110, 0x40, 0x268, 0x170, 0x288, 0xbc8, 0x894;
 	byte isLoading: "Breaker-Win64-Shipping.exe", 0x61E4339;
 	uint worldState: "Breaker-Win64-Shipping.exe", 0x5FF6D78;
+	float movementLR1: "Breaker-Win64-Shipping.exe", 0x5FF9EA0, 0x148, 0x160;
+	float movementLR2: "Breaker-Win64-Shipping.exe", 0x5FF9EA0, 0x0, 0x4b0, 0x160;
+	float movementFB1: "Breaker-Win64-Shipping.exe", 0x5FF9EA0, 0x148, 0x164;
+	float movementLR2: "Breaker-Win64-Shipping.exe", 0x5FF9EA0, 0x0, 0x4b0, 0x164;
+	
 }
 
 init
@@ -26,13 +29,16 @@ init
 }
 
 update
-{
+{	
+	// print("bc: " + current.bossCount + " pc: " + current.prismCount + " resAmt: " + current.teleportRestartAmount_preReport + " isLoading: " + current.isLoading + " world: " + current.worldState);
+	// print("MFB:" + current.movementFB1 + " MLR: " + current.movementLR1 + " x: " + current.playerXCoord + " y: " + current.playerYCoord + " z: " + current.playerZCoord);	
+	
 	// reset to fresh state;
 	vars.startTrigger = 0;
 	
-	// print("hello");
 	
-	// detect loading into gameworld;
+	
+	// detect loading into gameworld
 	if (current.worldState == 0 && old.worldState == 1)
 	{
 		print("dropped into run");
@@ -45,13 +51,13 @@ update
 		}
 	}
 	
-	// trigger start on user input;
+	// trigger start on user movement;
 	if (vars.startWatch == 1)
 	{
-		print("watching for user input");
-		if (current.inputCount != old.inputCount)
+		print("watching for user movement");
+		if (current.movementFB1 != 0 || current.movementLR1 != 0)
 		{
-			print("user input detected, lets go!");
+			print("user movement detected, lets go!");
 			vars.startTrigger = 1;
 			vars.startWatch = 0;
 		}
@@ -84,11 +90,14 @@ split
 		return true;
 	}
 	
-	// split on extract
-	if (current.extractCount == 4 && old.extractCount == 3)
+	// split on extract if all objectives complete
+	if (current.bossCount == 3 && current.prismCount == 6)
 	{
-		print("extracted!");
-		return true;
+		if (current.extractCount == 4 && old.extractCount == 3)
+		{
+			print("final extract!");
+			return true;
+		}
 	}
 	
 	// split on end screen
