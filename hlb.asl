@@ -21,16 +21,16 @@ state("Breaker-Win64-Shipping")
 
 init
 {
-	vars.taintedStart = 0;
-	vars.extractTrigger = 0;
-	vars.inRun = 0;
 	vars.startWatch = 0;
 	vars.startTrigger = 0;
+	vars.objectivesComplete = 0;
+	vars.prismsComplete = 0;
+	vars.bossesComplete = 0;
 }
 
 update
 {	
-	// print("bc: " + current.bossCount + " pc: " + current.prismCount + " resAmt: " + current.teleportRestartAmount_preReport + " isLoading: " + current.isLoading + " world: " + current.worldState);
+	// print("bc: " + current.bossCount + " " + vars.bossesComplete + " pc: " + current.prismCount + " " + vars.prismsComplete + " resAmt: " + current.teleportRestartAmount_preReport + " isLoading: " + current.isLoading + " world: " + current.worldState);
 	// print("MFB:" + current.movementFB1 + " MLR: " + current.movementLR1 + " x: " + current.playerXCoord + " y: " + current.playerYCoord + " z: " + current.playerZCoord);	
 	
 	// reset to fresh state;
@@ -80,6 +80,7 @@ split
 	if (current.prismCount == old.prismCount+1)
 	{
 		print("prism acquired!");
+		vars.prismsComplete = vars.prismsComplete+1;
 		return true;
 	}
 	
@@ -87,11 +88,12 @@ split
 	if (current.bossCount == old.bossCount+1)
 	{
 		print("boss downed!");
+		vars.bossesComplete = vars.bossesComplete+1;
 		return true;
 	}
 	
 	// split on extract if all objectives complete
-	if (current.bossCount == 3 && current.prismCount == 6)
+	if (vars.bossesComplete == 3 && vars.prismsComplete == 6)
 	{
 		if (current.extractCount == 4 && old.extractCount == 3)
 		{
